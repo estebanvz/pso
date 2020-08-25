@@ -1,8 +1,10 @@
 <template>
   <div class="game">
-    <div class="columns is-centered">
-      <div ref="gameContainer" class="column is-8">
-        <b-field label="Configuracion">
+
+    <div class="columns">
+      <div class="column"></div>
+      <div ref="gameContainer" class="column is-5">
+        <b-field label="Configuración">
           <b-taglist attached class="center">
             <b-tag type="is-dark">Partículas</b-tag>
             <b-tag type="is-info">{{ numParticles }}</b-tag>
@@ -16,8 +18,9 @@
         </b-field>
         <div id="game"></div>
       </div>
-      <div class="column is-3 has-text-centered">
-        <section>
+      <div class="column"></div>
+      <div class="column is-3">
+        <section class="container has-text-centered">
           <b-field label="Reiniciar">
             <b-button type="is-primary" @click="optimizar()"
               >Optimizar!</b-button
@@ -78,6 +81,15 @@
           </b-field>
         </section>
       </div>
+      <div class="column"></div>
+    </div>
+        <div class="columns">
+      <div class="column">
+        <h1 class="title is-4 is-uppercase">
+        Vídeos explicativos
+        </h1>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PLDYZ1fcxipYm_YUAIm4WlvpI_ItaxG_3o" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
     </div>
   </div>
 </template>
@@ -110,7 +122,7 @@ export default {
       c2: 10,
       w: 10,
       alg: 2,
-      levy:3,
+      levy: 3,
       nLeaders: 3,
       selectedF: 1,
       initialize: true,
@@ -126,11 +138,13 @@ export default {
   beforeDestroy() {
     this.game.destroy();
   },
-  mounted() {},
+  mounted() {
+    this.optimizar();
+  },
   methods: {
     updateData() {
       localStorage.setItem("alg", this.alg);
-      localStorage.setItem("levy", this.levy/10*2);
+      localStorage.setItem("levy", (this.levy / 10) * 2);
       localStorage.setItem("numParticles", this.numParticles);
       localStorage.setItem("nLeaders", this.nLeaders);
       localStorage.setItem("selectedF", this.selectedF);
@@ -160,7 +174,7 @@ export default {
           },
           init() {
             this.swarm = [];
-            this.levyA= localStorage.getItem('levy')*1.0;
+            this.levyA = localStorage.getItem("levy") * 1.0;
             this.nLiders = localStorage.getItem("nLeaders") * 1;
             this.numParticles = localStorage.getItem("numParticles") * 1;
             this.alg = localStorage.getItem("alg") * 1;
@@ -220,7 +234,7 @@ export default {
                       [0, 600],
                     ]
                   );
-                  tmp.a=this.levyA;
+                  tmp.a = this.levyA;
                   this.swarm.push(tmp);
                   this.setLiders = true;
                   break;
@@ -266,27 +280,32 @@ export default {
             this.kKey = this.input.keyboard.addKey(
               Phaser.Input.Keyboard.KeyCodes.K
             );
+            this.input.addPointer(3);
 
             this.flagPress = false;
-            this.text = this.add.text(0, 0, "Un Analista Peruano - Eyachay", {
-              fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif',
-            });
+            this.text = this.add.text(
+              0,
+              0,
+              "Un Analista Peruano - Eyachay - Presione la tecla Espacio, K, o click para iniciar",
+              {
+                fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif',
+              }
+            );
           },
           update() {
-            this.text.text =
-              "Best (Wolfram alpha) " +
-              this.f.solution.toFixed(5) +
-              " PSO: " +
-              this.bestErrG.toFixed(5);
-            if (this.bestPostG.length > 0) {
-              this.text.text +=
-                " POS: " +
-                this.bestPostG[0].toFixed(3) +
-                " " +
-                this.bestPostG[1].toFixed(3);
-            }
-
-            if ((this.spaceBar.isDown && !this.flagPress) || this.kKey.isDown) {
+            if ((this.spaceBar.isDown && !this.flagPress) || this.kKey.isDown || this.input.pointer1.isDown) {
+              this.text.text =
+                "Best (Wolfram alpha) " +
+                this.f.solution.toFixed(5) +
+                " PSO: " +
+                this.bestErrG.toFixed(5);
+              if (this.bestPostG.length > 0) {
+                this.text.text +=
+                  " POS: " +
+                  this.bestPostG[0].toFixed(3) +
+                  " " +
+                  this.bestPostG[1].toFixed(3);
+              }
               this.flagPress = true;
               let tmpErrors = [];
               for (let i = 0; i < this.numParticles; i++) {
@@ -390,6 +409,13 @@ export default {
             }
           },
         },
+        callbacks: {
+          postBoot: function(game) {
+            // In v3.15, you have to override Phaser's default styles
+            game.canvas.style.width = "100%";
+            game.canvas.style.height = "100%";
+          },
+        },
         parent: "game",
       });
     },
@@ -404,5 +430,13 @@ export default {
   display: block;
   margin: 0 auto;
   text-align: center;
+}
+.columns {
+  max-width: 100%;
+}
+@media (max-width: 768px) {
+  .columns {
+    margin-left: 0px !important;
+  }
 }
 </style>
